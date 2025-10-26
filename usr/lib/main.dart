@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
+import 'dart:io' show Platform;
 
 void main() {
   runApp(const MyApp());
@@ -30,15 +32,20 @@ class WebViewScreen extends StatefulWidget {
 }
 
 class _WebViewScreenState extends State<WebViewScreen> {
-  late final WebViewController _controller;
+  late InAppWebViewController _webViewController;
+  final GlobalKey webViewKey = GlobalKey();
+
+  InAppWebViewSettings settings = InAppWebViewSettings(
+    javaScriptEnabled: true,
+    supportZoom: false,
+    clearCache: true,
+    allowsInlineMediaPlayback: true,
+    mediaPlaybackRequiresUserGesture: false,
+  );
 
   @override
   void initState() {
     super.initState();
-
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse("https://bigliettilandia.it"));
   }
 
   @override
@@ -48,7 +55,23 @@ class _WebViewScreenState extends State<WebViewScreen> {
         title: const Text('Bigliettilandia'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: WebViewWidget(controller: _controller),
+      body: InAppWebView(
+        key: webViewKey,
+        initialUrlRequest: URLRequest(url: WebUri('https://bigliettilandia.it')),
+        initialSettings: settings,
+        onWebViewCreated: (controller) {
+          _webViewController = controller;
+        },
+        onLoadStart: (controller, url) {
+          // Puoi aggiungere logica qui se necessario
+        },
+        onLoadStop: (controller, url) {
+          // Puoi aggiungere logica qui se necessario
+        },
+        onReceivedError: (controller, request, error) {
+          // Gestione errori
+        },
+      ),
     );
   }
 }
